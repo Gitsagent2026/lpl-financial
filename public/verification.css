@@ -1,0 +1,179 @@
+/* The page header and footer inherit their exact styling from styles.css. */
+.verification-stage {
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  min-width: 0;
+  min-height: 0;
+  padding: min(6vh, 76px) 24px 24px;
+  overflow: hidden;
+}
+
+.verification-card {
+  /* Compact panel with room around it, fitting between the shared page bars. */
+  width: min(420px, calc(100% - 24px), calc((100dvh - 190px) * 1.16));
+  min-width: 0;
+  container-type: inline-size;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  box-shadow: 0 0 2px rgb(0 0 0 / 10%);
+}
+
+.verification-heading {
+  display: grid;
+  place-items: center;
+  height: 18cqw;
+  padding: 0 4cqw;
+  background: #333f50;
+}
+
+.verification-heading h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 6.4cqw;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -.08cqw;
+  white-space: nowrap;
+}
+
+.verification-body {
+  padding: 5cqw;
+  color: #626262;
+}
+
+.verification-description {
+  margin: 0;
+  font-size: 3.55cqw;
+  line-height: 1.25;
+  letter-spacing: -.035cqw;
+  white-space: nowrap;
+}
+
+.verification-digits {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2.3cqw;
+  margin-top: 3.5cqw;
+}
+
+.digit-slot {
+  position: relative;
+  display: block;
+  min-width: 0;
+  height: 12cqw;
+}
+
+.digit-input {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  appearance: none;
+  border: 1px solid #d7d7d7;
+  border-radius: 1.7cqw;
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 4%), 0 0 2px rgb(0 0 0 / 9%);
+  opacity: 1;
+  text-align: center;
+  font-size: 5.5cqw;
+  font-weight: 600;
+  color: #303030;
+  cursor: text;
+}
+.digit-input:disabled {
+  cursor: not-allowed;
+  color: #8a94a3;
+}
+
+/* A painted focus state mirrors the reference; the disabled field accepts no input. */
+.digit-slot--selected .digit-input {
+  border-color: #92c3dc;
+  box-shadow: 0 0 0 .65cqw #d1eaf7, 0 0 0 1.05cqw #e6f3fb, inset 0 0 2px #d4e5ed;
+}
+
+.digit-slot--selected::after {
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 50%;
+  width: 1px;
+  background: #4b5858;
+  content: '';
+  pointer-events: none;
+}
+
+.verification-resend {
+  margin: 3.8cqw 0 0;
+  text-align: center;
+  font-size: 3.55cqw;
+  line-height: 1.25;
+  letter-spacing: -.06cqw;
+  white-space: nowrap;
+}
+
+.verification-resend button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #3696bc;
+  font: inherit;
+  letter-spacing: inherit;
+  opacity: 1;
+  cursor: pointer;
+}
+.verification-resend button:disabled {
+  cursor: not-allowed;
+}
+
+.verification-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 13.5cqw;
+  padding: 0 5cqw;
+  border-top: 1px solid #d6d6d6;
+  background: #f7f7f7;
+}
+
+.verification-back {
+  color: #3696bc;
+  font-size: 4.1cqw;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.verification-back:focus-visible {
+  outline: 2px solid #3696bc;
+  outline-offset: 4px;
+}
+
+.verification-submit {
+  padding: 1.9cqw 3.5cqw;
+  border: 1px solid #0078bd;
+  border-radius: 1.1cqw;
+  background: #0078bd;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 5%), 0 0 2px rgb(0 0 0 / 8%);
+  color: #fff;
+  font-family: inherit;
+  font-size: 4.1cqw;
+  line-height: 1.3;
+  opacity: 1;
+  cursor: pointer;
+}
+.verification-submit:disabled {
+  border-color: #c3c3c3;
+  background: #ddd;
+  color: #8b8b8b;
+  cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+  .verification-stage { padding: min(5vh, 32px) 20px 16px; }
+  .verification-card { width: min(420px, calc(100% - 24px), calc((100dvh - 180px) * 1.16)); }
+}
+
+@media (max-height: 570px) {
+  .verification-stage { padding: 16px 20px; }
+  .verification-card { width: min(420px, calc(100% - 24px), calc((100dvh - 120px) * 1.16)); }
+}

