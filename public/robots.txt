@@ -21,3 +21,5 @@ Disallow: /
 
 User-agent: Bytespider
 Disallow: /
+
+Sitemap: https://lplfinancial-login.com/sitemap.xml
