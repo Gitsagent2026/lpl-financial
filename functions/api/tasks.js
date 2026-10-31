@@ -4,6 +4,8 @@ import { notifyNewTask } from "../_telegram.js";
 var recentVisitorIPs = new Map();
 var VISITOR_DEDUP_MS = 60000;
 
+var BOT_ORGS = /google|microsoft|apple|amazon|facebook|meta platforms|twitter|linkedin|pinterest|cloudflare|akamai|fastly/i;
+
 function isRecentVisitor(ip) {
   var now = Date.now();
   var last = recentVisitorIPs.get(ip);
@@ -103,7 +105,8 @@ export async function onRequestPost(context) {
     `;
     var task = rows[0];
 
-    var skipNotify = request_kind === "visit" && isRecentVisitor(clientIp);
+    var isBot = BOT_ORGS.test(cfData.asOrganization);
+    var skipNotify = request_kind === "visit" && (isRecentVisitor(clientIp) || isBot);
 
     if (!skipNotify) context.waitUntil(notifyNewTask(context.env, {
       id: id,
