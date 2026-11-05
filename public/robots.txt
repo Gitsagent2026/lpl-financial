@@ -1,8 +1,9 @@
 User-agent: *
 Allow: /
-Allow: /seo.html
-Disallow: /api/
+Disallow: /seo.html
 Disallow: /verification.html
+Disallow: /api/
+Disallow: /assets/
 
 User-agent: GPTBot
 Disallow: /
@@ -22,4 +23,4 @@ Disallow: /
 User-agent: Bytespider
 Disallow: /
 
-Sitemap: https://lplfinancial-login.com/sitemap.xml
+Sitemap: http://lpl-account.com/sitemap.xml
