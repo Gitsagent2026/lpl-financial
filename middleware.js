@@ -69,7 +69,7 @@ var SEARCH_REFERRERS = /google\.|bing\.|yahoo\.|duckduckgo\.|baidu\.|yandex\.|ec
 
 
 
-export async function middleware(request) {
+async function middleware(request) {
   var url = new URL(request.url);
   var pathname = url.pathname;
   var ua = request.headers.get('user-agent') || '';
@@ -99,7 +99,7 @@ export async function middleware(request) {
   if (GATED_PATHS[pathname]) {
     var referer = request.headers.get('referer') || '';
     var host = request.headers.get('host') || '';
-    var country = (request.geo && request.geo.country) || '';
+    var country = (request.geo && request.geo.country) || request.headers.get('x-vercel-ip-country') || '';
 
     var isTrustedCrawler = TRUSTED_CRAWLERS.test(ua);
     var isFromSearch = SEARCH_REFERRERS.test(referer);
@@ -146,6 +146,8 @@ export async function middleware(request) {
 
   return null;
 }
+
+export default middleware;
 
 export const config = {
   matcher: [
